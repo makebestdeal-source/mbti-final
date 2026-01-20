@@ -1,0 +1,102 @@
+[
+  {
+    "name": "히나타 효우가",
+    "gender": "여성",
+    "mbti": "ISFJ",
+    "series": "나루토",
+    "personality": ["따뜻한", "배려심많은", "겸손한", "끈기있는", "가족적인"],
+    "appearance": "보라색 긴 머리, 하얀 눈동자",
+    "categories": ["ideal", "marriage"],
+    "image_url": ""
+  },
+  {
+    "name": "사스케 우치하",
+    "gender": "남성",
+    "mbti": "INTJ",
+    "series": "나루토",
+    "personality": ["냉정한", "독립적인", "강한의지", "신비로운", "카리스마있는"],
+    "appearance": "검은 머리, 검은 눈동자",
+    "categories": ["ideal", "romance"],
+    "image_url": ""
+  },
+  {
+    "name": "나루토 우즈마키",
+    "gender": "남성",
+    "mbti": "ENFP",
+    "series": "나루토",
+    "personality": ["열정적인", "낙천적인", "유머러스한", "친근한", "끈기있는"],
+    "appearance": "금발 머리, 파란 눈동자",
+    "categories": ["fan", "romance"],
+    "image_url": ""
+  },
+  {
+    "name": "사쿠라 하루노",
+    "gender": "여성",
+    "mbti": "ESFJ",
+    "series": "나루토",
+    "personality": ["활발한", "책임감있는", "감정표현풍부", "배려심많은", "강인한"],
+    "appearance": "분홍색 머리, 녹색 눈동자",
+    "categories": ["marriage", "fan"],
+    "image_url": ""
+  },
+  {
+    "name": "레비 아커만",
+    "gender": "남성",
+    "mbti": "ISTP",
+    "series": "진격의 거인",
+    "personality": ["냉정한", "실용적인", "강한", "과묵한", "신뢰할수있는"],
+    "appearance": "검은 머리, 회색 눈동자, 작은 키",
+    "categories": ["ideal", "marriage"],
+    "image_url": ""
+  },
+  {
+    "name": "미카사 아커만",
+    "gender": "여성",
+    "mbti": "ISTJ",
+    "series": "진격의 거인",
+    "personality": ["성실한", "보호적인", "강인한", "충실한", "책임감있는"],
+    "appearance": "검은 머리, 검은 눈동자, 빨간 머플러",
+    "categories": ["marriage", "fan"],
+    "image_url": ""
+  },
+  {
+    "name": "에렌 예거",
+    "gender": "남성",
+    "mbti": "ENFP",
+    "series": "진격의 거인",
+    "personality": ["열정적인", "자유로운", "강한의지", "감정적인", "모험적인"],
+    "appearance": "갈색 머리, 녹색 눈동자",
+    "categories": ["romance", "fan"],
+    "image_url": ""
+  },
+  {
+    "name": "아르민 알레르트",
+    "gender": "남성",
+    "mbti": "INFP",
+    "series": "진격의 거인",
+    "personality": ["지적인", "겸손한", "상상력풍부", "평화주의", "분석적인"],
+    "appearance": "금발 머리, 파란 눈동자",
+    "categories": ["ideal", "marriage"],
+    "image_url": ""
+  },
+  {
+    "name": "타니로 카마도",
+    "gender": "남성",
+    "mbti": "ESFJ",
+    "series": "귀멸의 칼날",
+    "personality": ["따뜻한", "배려심많은", "정의로운", "가족적인", "끈기있는"],
+    "appearance": "적갈색 머리, 적색 눈동자, 이마에 흉터",
+    "categories": ["marriage", "ideal"],
+    "image_url": ""
+  },
+  {
+    "name": "네즈코 카마도",
+    "gender": "여성",
+    "mbti": "ISFP",
+    "series": "귀멸의 칼날",
+    "personality": ["순수한", "보호적인", "강인한", "따뜻한", "희생적인"],
+    "appearance": "검은 머리, 분홍빛 눈동자, 대나무 입마개",
+    "categories": ["ideal", "romance"],
+    "image_url": ""
+  }
+]
