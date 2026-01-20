@@ -55,6 +55,21 @@ ga_script = f"""
 st.markdown(ga_script, unsafe_allow_html=True)
 
 # ============================================
+# 💰 AdFit 광고
+# ============================================
+def show_ad():
+    ad_code = """
+    <div style="display:flex;justify-content:center;margin:15px 0;">
+        <ins class="kakao_ad_area" style="display:none;"
+             data-ad-unit="DAN-iGpl6hVjoJ8vlNoZ"
+             data-ad-width="320"
+             data-ad-height="100"></ins>
+        <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+    </div>
+    """
+    st.components.v1.html(ad_code, height=120)
+
+# ============================================
 # 📊 테스트 설정
 # ============================================
 TEST_CONFIG = {
@@ -411,6 +426,9 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
+    # 첫 화면 광고
+    show_ad()
+    
     # 입력 / 결과
     if not st.session_state.done:
         st.markdown('<div class="card">', unsafe_allow_html=True)
@@ -487,6 +505,9 @@ def main():
             tags = ''.join([f'<span class="tag">{t("p",lang).get(p,p)}</span>' for p in top.get('personality',[])[:3]])
             st.markdown(f'<div style="text-align:center;margin:10px 0;">{tags}</div>', unsafe_allow_html=True)
             st.markdown(f'<div style="text-align:center;"><span class="mbti-badge">{top.get("mbti","?")}</span></div>', unsafe_allow_html=True)
+            
+            # 광고
+            show_ad()
             
             # 공유
             share_text = f"{name_display} {sc}%! - MBTI Match Test"
