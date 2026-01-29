@@ -102,8 +102,10 @@ try:
         try:
             paths = [
                 file,
+                f"data/{file}",
                 f"/mnt/user-data/uploads/{file}",
-                os.path.join(os.getcwd(), file)
+                os.path.join(os.getcwd(), file),
+                os.path.join(os.getcwd(), "data", file)
             ]
             
             for path in paths:
