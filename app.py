@@ -1,18 +1,14 @@
-
 import streamlit as st
 import json
 import random
 import urllib.parse
 import os
 import streamlit.components.v1 as components
-import traceback # 디버깅용
+import traceback
 
-# 1. 페이지 설정 (반드시 맨 위)
 st.set_page_config(page_title="SoulFinder", page_icon="💘", layout="centered")
 
-# [안전장치] 메인 로직을 try-except로 감싸서 에러 발생 시 내용을 화면에 출력
 try:
-    # 2. 광고 코드
     def show_ad():
         ad_code = """
         <div style="display:flex;justify-content:center;margin:15px 0;">
@@ -25,7 +21,6 @@ try:
         """
         components.html(ad_code, height=120)
 
-    # 3. CSS 스타일 (버튼, 로고, 모바일 최적화)
     st.markdown("""
         <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -33,7 +28,6 @@ try:
         
         .jm-logo { text-align: center; color: #aaa; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; font-size: 14px; }
         
-        /* Primary 버튼 (보라색, 흰글씨) */
         div.stButton > button[kind="primary"] {
             background: linear-gradient(135deg, #667eea, #764ba2) !important;
             color: white !important;
@@ -44,22 +38,34 @@ try:
         }
         div.stButton > button[kind="primary"] p { color: white !important; }
         
-        /* Secondary 버튼 (흰색) */
         div.stButton > button[kind="secondary"] {
             background: white !important;
             color: #333 !important;
             border: 1px solid #ddd !important;
-            height: 100px !important;
+            height: 90px !important;
+            font-size: 16px !important;
+            padding: 10px !important;
+            white-space: pre-line !important;
+            line-height: 1.4 !important;
         }
         
+        @media (max-width: 768px) {
+            div.stButton > button[kind="secondary"] {
+                height: 80px !important;
+                font-size: 14px !important;
+            }
+            .res-img { width: 200px !important; }
+        }
+        
+        div[data-testid="column"] { padding: 0 5px !important; }
+        
         .center-box { display: flex; justify-content: center; margin: 20px 0; }
-        .res-img { width: 250px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .res-img { width: 250px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); max-width: 100%; }
         .desc-box { background: #fff; padding: 20px; border-radius: 15px; text-align: center; border: 1px solid #eee; color: #555; margin-top: 15px; }
         .footer { text-align: center; margin-top: 50px; color: #ccc; font-size: 0.8rem; }
         </style>
     """, unsafe_allow_html=True)
 
-    # 4. 상수 및 설정
     CATEGORIES = {
         "dogs": {"icon": "🐶", "ko": "강아지", "en": "Dog"},
         "cats": {"icon": "🐱", "ko": "고양이", "en": "Cat"},
@@ -92,17 +98,23 @@ try:
         "ISTJ": ["ESFP", "ESTP"], "ESTP": ["ISFJ", "ISTJ"]
     }
 
-    # 5. 데이터 로드 (안전 장치 포함)
     def load_data(file):
         try:
-            if os.path.exists(file):
-                with open(file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    if data: return data
-        except Exception:
-            pass
+            paths = [
+                file,
+                f"/mnt/user-data/uploads/{file}",
+                os.path.join(os.getcwd(), file)
+            ]
+            
+            for path in paths:
+                if os.path.exists(path):
+                    with open(path, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        if data: 
+                            return data
+        except Exception as e:
+            st.error(f"파일 로딩 오류: {str(e)}")
         
-        # 비상용 데이터
         return [{
             "id": "fallback",
             "names": {"ko": "로딩 오류", "en": "Error"},
@@ -112,7 +124,6 @@ try:
             "image_url": "https://api.dicebear.com/9.x/notionists/png?seed=error"
         }]
 
-    # 6. 매칭 로직
     def calc_score(user, item):
         score = 100
         diff_sum = 0
@@ -130,13 +141,11 @@ try:
             elif u_mbti[0] == i_mbti[0] and u_mbti[3] == i_mbti[3]: score += 5
         return int(max(0, min(100, score)))
 
-    # 7. 메인 화면 로직
     st.markdown("<div class='jm-logo'>JM STUDIO</div>", unsafe_allow_html=True)
 
     if 'page' not in st.session_state: st.session_state.page = 'intro'
     if 'lang' not in st.session_state: st.session_state.lang = 'ko'
     
-    # 언어 선택
     c1, c2 = st.columns([3, 1])
     with c2:
         lang_map = {"🇰🇷 KO": "ko", "🇺🇸 EN": "en", "🇯🇵 JA": "ja", "🇨🇳 ZH": "zh", "🇪🇸 ES": "es"}
@@ -145,7 +154,6 @@ try:
     
     t = TRANS[st.session_state.lang]
 
-    # PAGE: INTRO
     if st.session_state.page == 'intro':
         st.markdown(f"<h1 style='text-align:center;'>{t['title']}</h1>", unsafe_allow_html=True)
         st.markdown(f"<p style='text-align:center;'>{t['desc']}</p>", unsafe_allow_html=True)
@@ -161,12 +169,11 @@ try:
                     cat = CATEGORIES[k]
                     label = cat['ko'] if st.session_state.lang == 'ko' else cat['en']
                     with cols[j]:
-                        if st.button(f"{cat['icon']}\\n{label}", key=k, type="secondary", use_container_width=True):
+                        if st.button(f"{cat['icon']}\n{label}", key=k, type="secondary", use_container_width=True):
                             st.session_state.cat = k
                             st.session_state.page = 'test'
                             st.rerun()
 
-    # PAGE: TEST
     elif st.session_state.page == 'test':
         cat_info = CATEGORIES[st.session_state.cat]
         label = cat_info['ko'] if st.session_state.lang == 'ko' else cat_info['en']
@@ -199,7 +206,6 @@ try:
             st.session_state.page = 'intro'
             st.rerun()
 
-    # PAGE: RESULT
     elif st.session_state.page == 'result':
         data = load_data(f"{st.session_state.cat}.json")
         
@@ -232,7 +238,6 @@ try:
             
     st.markdown(f"<div class='footer'>© 2024 JM STUDIO.<br>{t['privacy']}</div>", unsafe_allow_html=True)
 
-# [안전장치] 에러 캡처
 except Exception:
     st.error("🚨 앱 실행 중 오류가 발생했습니다.")
     st.code(traceback.format_exc())
