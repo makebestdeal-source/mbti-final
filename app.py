@@ -3,11 +3,11 @@ import streamlit as st
 import json
 import random
 import urllib.parse
+import os
 import streamlit.components.v1 as components
 
 st.set_page_config(page_title="SoulFinder", page_icon="💘", layout="centered")
 
-# [광고] AdFit 함수
 def show_ad():
     ad_code = """
     <div style="display:flex;justify-content:center;margin:15px 0;">
@@ -27,28 +27,22 @@ st.markdown("""
     
     .jm-logo { text-align: center; color: #aaa; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; font-size: 14px; }
     
-    /* [수정] Primary 버튼 (보라색 배경, 흰색 글씨, 투명도 없음) */
+    /* [수정] 버튼 스타일: 복잡한 CSS 제거하고 기본기능 강화 */
     div.stButton > button[kind="primary"] {
         background: linear-gradient(135deg, #667eea, #764ba2) !important;
         color: white !important;
         border: none !important;
         font-weight: 700 !important;
         height: 50px !important;
-        opacity: 1 !important; /* 투명도 문제 해결 */
+        opacity: 1 !important;
     }
-    div.stButton > button[kind="primary"] p {
-        color: white !important; /* 글자색 강제 흰색 */
-    }
-    div.stButton > button[kind="primary"]:hover {
-        opacity: 0.9 !important;
-        color: white !important;
-    }
+    div.stButton > button[kind="primary"] p { color: white !important; }
     
     div.stButton > button[kind="secondary"] {
         background: white !important;
         color: #333 !important;
         border: 1px solid #ddd !important;
-        height: 110px !important;
+        height: 100px !important; /* 높이 약간 조절 */
     }
     
     .center-box { display: flex; justify-content: center; margin: 20px 0; }
@@ -90,11 +84,27 @@ COMPATIBILITY = {
     "ISTJ": ["ESFP", "ESTP"], "ESTP": ["ISFJ", "ISTJ"]
 }
 
-@st.cache_data
+# [핵심 수정] 데이터 로드 실패 시 비상용 데이터 반환 (에러 방지)
 def load_data(file):
     try:
-        with open(file, 'r', encoding='utf-8') as f: return json.load(f)
-    except: return []
+        # 파일이 있는지 먼저 확인
+        if os.path.exists(file):
+            with open(file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                if data: return data
+    except Exception as e:
+        print(f"Error loading {file}: {e}")
+    
+    # [비상용 데이터] 파일이 없거나 에러나면 이거라도 보여줌 (앱 죽는 것 방지)
+    fallback_item = {
+        "id": "fallback_0",
+        "names": {"ko": "데이터 로딩 중...", "en": "Loading...", "ja": "読み込み中", "zh": "载入中", "es": "Cargando"},
+        "mbti": "ENFP",
+        "description": {"ko": "데이터를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.", "en": "Error loading data.", "ja": "エラーが発生しました。", "zh": "发生错误。", "es": "Error."},
+        "traits": {"energy": 5, "social": 5, "indep": 5, "sense": 5, "play": 5},
+        "image_url": "https://api.dicebear.com/9.x/notionists/png?seed=error"
+    }
+    return [fallback_item]
 
 def calc_score(user, item):
     score = 100
@@ -103,17 +113,13 @@ def calc_score(user, item):
         u_val = user['traits'][k]
         i_val = item['traits'].get(k, 5)
         diff_sum += abs(u_val - i_val)
-    
     score -= (diff_sum * 1.5)
-    
     u_mbti = user['mbti']
     i_mbti = item.get('mbti', '')
-    
     if i_mbti:
         if i_mbti in COMPATIBILITY.get(u_mbti, []): score += 15
         elif u_mbti == i_mbti: score += 10
         elif u_mbti[0] == i_mbti[0] and u_mbti[3] == i_mbti[3]: score += 5
-            
     return int(max(0, min(100, score)))
 
 def main():
@@ -145,7 +151,8 @@ def main():
                     cat = CATEGORIES[k]
                     label = cat['ko'] if st.session_state.lang == 'ko' else cat['en']
                     with cols[j]:
-                        if st.button(f"{cat['icon']}\n{label}", key=k, type="secondary"):
+                        # [핵심 수정] use_container_width=True 로 모바일 가로 꽉 채우기
+                        if st.button(f"{cat['icon']}\n{label}", key=k, type="secondary", use_container_width=True):
                             st.session_state.cat = k
                             st.session_state.page = 'test'
                             st.rerun()
@@ -168,6 +175,7 @@ def main():
             t4 = st.slider("💧 Sensitivity (1-10)", 1, 10, 5)
             t5 = st.slider("🎢 Playfulness (1-10)", 1, 10, 5)
             
+            # [핵심 수정] use_container_width=True
             if st.form_submit_button(t['btn'], type="primary", use_container_width=True):
                 if mbti == "-": st.error(t['warn'])
                 else:
@@ -178,14 +186,22 @@ def main():
                     st.session_state.page = 'result'
                     st.rerun()
         
-        if st.button("🏠 Home", type="secondary"):
+        # [핵심 수정] use_container_width=True
+        if st.button("🏠 Home", type="secondary", use_container_width=True):
             st.session_state.page = 'intro'
             st.rerun()
 
     elif st.session_state.page == 'result':
         data = load_data(f"{st.session_state.cat}.json")
-        best = max(data, key=lambda x: calc_score(st.session_state.user, x))
-        score = calc_score(st.session_state.user, best)
+        
+        # 데이터가 비상용 데이터인지 확인
+        if data and data[0]['id'] == 'fallback_0':
+            best = data[0]
+            score = 0
+            st.error("데이터 파일을 찾을 수 없어 임시 화면을 표시합니다.")
+        else:
+            best = max(data, key=lambda x: calc_score(st.session_state.user, x))
+            score = calc_score(st.session_state.user, best)
         
         lang = st.session_state.lang
         r_name = best['names'].get(lang, best['names']['en'])
